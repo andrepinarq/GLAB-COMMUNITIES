@@ -33,7 +33,8 @@ Os ambientes `teste` e `producao` têm banco, fotos e segredos separados. Os doi
    - Account · **Workers R2 Storage** · Edit
    - Account · **Account Settings** · Read
    - User · **User Details** · Read
-4. Em **Account Resources**, escolha só a sua conta. Em **Zone Resources**, deixe só a zona do domínio, se ela já existir na Cloudflare; senão, deixe como está.
+   - Zone · **Workers Routes** · Edit e Zone · **DNS** · Edit. Só são necessárias para ligar `membros.gavealab.com.br`, depois que o DNS estiver na Cloudflare.
+4. Em **Account Resources**, escolha só a sua conta. Em **Zone Resources**, escolha só `gavealab.com.br`. Se o domínio ainda não estiver na Cloudflare, crie o token sem as permissões de Zone e edite-o depois.
 5. Opcional, mas recomendado: em **TTL**, defina uma data de validade (por exemplo, 90 dias).
 6. Clique em **Continue to summary → Create Token** e copie o token. Ele só aparece uma vez.
 
@@ -110,15 +111,10 @@ No plano gratuito, os pedidos de senha devem aparecer como "excedeu o limite de 
 
 ---
 
-## Parte E — `membros.gavealab.com.br` (decisão futura)
+## Parte E — `membros.gavealab.com.br`
 
-Um domínio próprio num Worker exige que o **DNS de gavealab.com.br seja gerenciado pela Cloudflare**. Hoje ele provavelmente está no WordPress.com.
+**Decidido:** o DNS de gavealab.com.br vai para a Cloudflare (plano gratuito). O site continua no WordPress.com e o e-mail no Titan.
 
-As opções (a decidir antes da produção):
-1. **Levar o DNS para a Cloudflare (plano gratuito).** O site continua hospedado no WordPress.com; só muda quem responde pelo DNS.
-   - É preciso copiar todos os registros atuais (site, e-mail, verificações) antes de trocar os nameservers.
-   - É a opção mais comum e sem custo, mas precisa ser feita com cuidado para não derrubar o e-mail.
-2. **Usar um domínio separado** só para a área de membros, já na Cloudflare.
-3. **Manter o endereço `workers.dev`**, sem domínio próprio.
+O inventário dos registros atuais e o passo a passo da troca, com verificação e como voltar atrás, estão em [`dns-cloudflare.md`](dns-cloudflare.md). A troca pode ser feita antes ou depois do Workers Paid; uma coisa não depende da outra.
 
-Nenhuma delas altera o conteúdo do WordPress.
+Depois da troca, `npm run deploy:producao` cria o subdomínio e o certificado automaticamente. Só será feito com a sua aprovação.
