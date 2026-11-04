@@ -11,7 +11,12 @@ Isso permite ligar `membros.gavealab.com.br` ao Worker da área de membros.
 - Os 8 registros foram conferidos na Cloudflare, todos como "DNS only".
 - O WordPress.com confirma: servidores próprios desligados, site ainda apontando para ele, SSL ativo.
 
-Falta a Cloudflare confirmar a zona como **Active** e fazer as verificações do passo 5.
+**Concluído em 04/11/2026.** Zona **Active** na Cloudflare. Verificações do passo 5 aprovadas:
+- site com e sem `www`, com cadeado;
+- e-mail entrando em `contato@`;
+- e-mail saindo, chegando à caixa de entrada, com SPF, DKIM e DMARC aprovados.
+
+A partir de agora, **mudanças de DNS de gavealab.com.br são feitas só na Cloudflare.** O painel de DNS do WordPress.com deixou de valer.
 
 ## Situação antes da troca (lida em 04/11/2026)
 
