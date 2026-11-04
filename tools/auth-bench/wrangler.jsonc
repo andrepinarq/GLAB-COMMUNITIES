@@ -1,0 +1,11 @@
+{
+  // Worker de medição do custo de CPU dos algoritmos de senha.
+  // Rodar localmente: npm run bench:auth
+  // Rodar no ambiente real: npx wrangler deploy --config tools/auth-bench/wrangler.jsonc
+  //   e acompanhar o cpuTime de cada pedido com: npx wrangler tail gavealab-auth-bench --format json
+  "name": "gavealab-auth-bench",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true }
+}

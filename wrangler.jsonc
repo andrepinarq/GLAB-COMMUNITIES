@@ -1,0 +1,41 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "gavealab-membros",
+  "main": "src/worker/index.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // Arquivos estáticos (a aplicação React) servidos pelo próprio Worker.
+  // Pedidos a arquivos estáticos não contam como execução do Worker.
+  "assets": {
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+
+  "d1_databases": [
+    { "binding": "DB", "database_name": "gavealab-membros", "database_id": "00000000-0000-0000-0000-000000000000", "migrations_dir": "migrations" }
+  ],
+  "r2_buckets": [
+    { "binding": "PHOTOS", "bucket_name": "gavealab-membros-fotos" }
+  ],
+
+  // Backup semanal do banco para o R2 (domingo, 06:17 UTC).
+  "triggers": { "crons": ["17 6 * * 0"] },
+
+  "vars": {
+    "APP_ENV": "development",
+    "APP_URL": "http://localhost:5173",
+    "EMAIL_FROM": "GáveaLab Communities <membros@gavealab.com.br>",
+    "PASSWORD_PBKDF2_ITERATIONS": "600000",
+    // Chave pública de teste do Turnstile (sempre aprova). Trocar pela real em produção.
+    "TURNSTILE_SITE_KEY": "1x00000000000000000000AA"
+  },
+  // Segredos (definir com `wrangler secret put`): TURNSTILE_SECRET, RESEND_API_KEY
+
+  "observability": { "enabled": true },
+
+  // Domínio de produção: só será ativado depois da sua aprovação.
+  // "routes": [{ "pattern": "membros.gavealab.com.br", "custom_domain": true }],
+
+  "env": {}
+}
