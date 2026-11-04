@@ -4,7 +4,16 @@
 
 Isso permite ligar `membros.gavealab.com.br` ao Worker da área de membros.
 
-## Situação atual (lida em 04/11/2026, sem alterações)
+## Status
+
+**Troca feita em 04/11/2026, por volta das 16h40.** Nameservers informados no WordPress.com: `ben.ns.cloudflare.com` e `serena.ns.cloudflare.com`.
+
+- Os 8 registros foram conferidos na Cloudflare, todos como "DNS only".
+- O WordPress.com confirma: servidores próprios desligados, site ainda apontando para ele, SSL ativo.
+
+Falta a Cloudflare confirmar a zona como **Active** e fazer as verificações do passo 5.
+
+## Situação antes da troca (lida em 04/11/2026)
 
 - **Registro do domínio:** WordPress.com, ativo até 17/08/2027, com renovação automática. A troca de nameservers é feita no próprio WordPress.com.
 - **Nameservers:** WordPress.com.
