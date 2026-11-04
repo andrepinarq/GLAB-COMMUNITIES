@@ -46,17 +46,18 @@ Sem `RESEND_API_KEY`, os e-mails ficam numa caixa de saída local: `http://local
 ## Testes
 
 ```bash
-npm test          # 41 testes: senhas, sessões, CSRF, limites, convites, privacidade, fotos, admin, backup
+npm test          # 43 testes: senhas, sessões, CSRF, limites, convites, privacidade, fotos, admin, backup
 npm run typecheck
 ```
 
-## Publicar (quando aprovado)
+## Publicar
 
-1. Criar o banco e o bucket: `npx wrangler d1 create gavealab-membros` e `npx wrangler r2 bucket create gavealab-membros-fotos`; colocar o `database_id` em `wrangler.jsonc`.
-2. Em `wrangler.jsonc`: `APP_ENV=production`, `APP_URL=https://membros.gavealab.com.br`, chave pública real do Turnstile, e descomentar `routes`.
-3. Segredos: `npx wrangler secret put TURNSTILE_SECRET` e `npx wrangler secret put RESEND_API_KEY`.
-4. `npm run db:migrate:remote`, depois `npm run build && npx wrangler deploy`.
-5. Primeiro admin: `node scripts/create-admin-invite.mjs --email ... --name ... --remote`.
+Passo a passo completo, da conta Cloudflare à produção: [`docs/publicar.md`](docs/publicar.md).
+
+```bash
+npm run db:migrate:teste && npm run deploy:teste        # ambiente de teste (*.workers.dev)
+npm run db:migrate:producao && npm run deploy:producao  # membros.gavealab.com.br
+```
 
 Em produção, a API **se recusa a funcionar** se faltar alguma configuração de segurança (Turnstile real, Resend, HTTPS, custo da senha).
 

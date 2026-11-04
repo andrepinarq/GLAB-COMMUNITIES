@@ -36,7 +36,8 @@ export function productionConfigProblems(env: Env): string[] {
   const problems: string[] = [];
   if (!env.APP_URL.startsWith("https://")) problems.push("APP_URL precisa usar https");
   if (!env.TURNSTILE_SECRET || env.TURNSTILE_SECRET === TURNSTILE_TEST_SECRET) problems.push("TURNSTILE_SECRET real ausente");
-  if (env.TURNSTILE_SITE_KEY === TURNSTILE_TEST_SITE_KEY) problems.push("TURNSTILE_SITE_KEY de teste");
+  if (env.TURNSTILE_SITE_KEY === TURNSTILE_TEST_SITE_KEY || !env.TURNSTILE_SITE_KEY.startsWith("0x")) problems.push("TURNSTILE_SITE_KEY real ausente");
+  if (env.APP_URL.includes("PREENCHER")) problems.push("APP_URL não preenchida");
   if (!env.RESEND_API_KEY) problems.push("RESEND_API_KEY ausente");
   if (Number(env.PASSWORD_PBKDF2_ITERATIONS) < 600000) problems.push("PASSWORD_PBKDF2_ITERATIONS abaixo de 600000 (OWASP)");
   return problems;

@@ -3,7 +3,7 @@
 // Pelo painel, a administração só cria convites de membro comum.
 //
 // Uso:
-//   node scripts/create-admin-invite.mjs --email voce@gavealab.com.br --name "Seu Nome" [--remote] [--url https://membros.gavealab.com.br]
+//   node scripts/create-admin-invite.mjs --email voce@gavealab.com.br --name "Seu Nome" [--remote --env teste|producao] [--url https://...]
 //
 // Sem --remote, grava no banco local de desenvolvimento.
 import { execFileSync } from "node:child_process";
@@ -17,7 +17,16 @@ const get = (flag) => {
 const email = get("--email")?.trim().toLowerCase();
 const name = get("--name")?.trim();
 const remote = args.includes("--remote");
-const appUrl = get("--url") ?? (remote ? "https://membros.gavealab.com.br" : "http://localhost:5173");
+const envName = get("--env"); // teste | producao
+const appUrl = get("--url") ?? (envName === "producao" ? "https://membros.gavealab.com.br" : remote ? undefined : "http://localhost:5173");
+if (!appUrl) {
+  console.error("Informe --url com o endereço do ambiente (ex.: https://gavealab-membros-teste.<conta>.workers.dev).");
+  process.exit(1);
+}
+if (remote && !envName) {
+  console.error("Com --remote, informe --env teste ou --env producao.");
+  process.exit(1);
+}
 
 if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || !name) {
   console.error('Uso: node scripts/create-admin-invite.mjs --email voce@exemplo.com --name "Seu Nome" [--remote]');
@@ -37,7 +46,7 @@ const sql = [
   `INSERT INTO audit_log (action, target_type, target_id, details) VALUES ('invite.create', 'invitation', ${q(id)}, ${q(JSON.stringify({ email, admin: true, via: "cli" }))});`,
 ].join("\n");
 
-execFileSync("npx", ["wrangler", "d1", "execute", "DB", remote ? "--remote" : "--local", "--command", sql], { stdio: ["ignore", "ignore", "inherit"] });
+execFileSync("npx", ["wrangler", "d1", "execute", "DB", remote ? "--remote" : "--local", ...(envName ? ["--env", envName] : []), "--command", sql], { stdio: ["ignore", "ignore", "inherit"] });
 
 console.log(`\nConvite de administração criado para ${email} (válido por 7 dias).`);
 console.log(`Link (pessoal, mostrado só agora):\n\n  ${appUrl}/convite#token=${token}\n`);

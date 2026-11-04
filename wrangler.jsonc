@@ -12,30 +12,68 @@
     "run_worker_first": ["/api/*"]
   },
 
+  // ── Configuração padrão = desenvolvimento local ─────────────────────────
   "d1_databases": [
-    { "binding": "DB", "database_name": "gavealab-membros", "database_id": "00000000-0000-0000-0000-000000000000", "migrations_dir": "migrations" }
+    { "binding": "DB", "database_name": "gavealab-membros-local", "database_id": "00000000-0000-0000-0000-000000000000", "migrations_dir": "migrations" }
   ],
   "r2_buckets": [
-    { "binding": "PHOTOS", "bucket_name": "gavealab-membros-fotos" }
+    { "binding": "PHOTOS", "bucket_name": "gavealab-membros-fotos-local" }
   ],
-
-  // Backup semanal do banco para o R2 (domingo, 06:17 UTC).
-  "triggers": { "crons": ["17 6 * * 0"] },
-
   "vars": {
     "APP_ENV": "development",
     "APP_URL": "http://localhost:5173",
     "EMAIL_FROM": "GáveaLab Communities <membros@gavealab.com.br>",
     "PASSWORD_PBKDF2_ITERATIONS": "600000",
-    // Chave pública de teste do Turnstile (sempre aprova). Trocar pela real em produção.
+    // Chave pública de TESTE do Turnstile (sempre aprova). Só vale localmente.
     "TURNSTILE_SITE_KEY": "1x00000000000000000000AA"
   },
-  // Segredos (definir com `wrangler secret put`): TURNSTILE_SECRET, RESEND_API_KEY
-
   "observability": { "enabled": true },
 
-  // Domínio de produção: só será ativado depois da sua aprovação.
-  // "routes": [{ "pattern": "membros.gavealab.com.br", "custom_domain": true }],
+  // Segredos de cada ambiente (nunca neste arquivo), definidos com:
+  //   npx wrangler secret put TURNSTILE_SECRET --env <teste|producao>
+  //   npx wrangler secret put RESEND_API_KEY   --env <teste|producao>
+  "env": {
+    // ── Teste: endereço *.workers.dev, mesmas regras de segurança de produção ──
+    "teste": {
+      "name": "gavealab-membros-teste",
+      "workers_dev": true,
+      // Workers Paid: teto de CPU por pedido. O login usa ~0,5 s; o teto evita abuso de custo.
+      // Numa conta no plano gratuito, a publicação com "limits" é recusada — isso é esperado.
+      "limits": { "cpu_ms": 2000 },
+      "triggers": { "crons": ["17 6 * * 0"] },
+      "d1_databases": [
+        { "binding": "DB", "database_name": "gavealab-membros-teste", "database_id": "PREENCHER_APOS_wrangler_d1_create", "migrations_dir": "migrations" }
+      ],
+      "r2_buckets": [{ "binding": "PHOTOS", "bucket_name": "gavealab-membros-fotos-teste" }],
+      "vars": {
+        "APP_ENV": "production",
+        "APP_URL": "https://gavealab-membros-teste.PREENCHER_SUBDOMINIO.workers.dev",
+        "EMAIL_FROM": "GáveaLab Communities <membros@gavealab.com.br>",
+        "PASSWORD_PBKDF2_ITERATIONS": "600000",
+        "TURNSTILE_SITE_KEY": "PREENCHER_CHAVE_PUBLICA_TURNSTILE"
+      },
+      "observability": { "enabled": true }
+    },
 
-  "env": {}
+    // ── Produção: membros.gavealab.com.br (só com sua aprovação) ──────────────
+    "producao": {
+      "name": "gavealab-membros",
+      "workers_dev": false,
+      "limits": { "cpu_ms": 2000 },
+      "triggers": { "crons": ["17 6 * * 0"] },
+      "routes": [{ "pattern": "membros.gavealab.com.br", "custom_domain": true }],
+      "d1_databases": [
+        { "binding": "DB", "database_name": "gavealab-membros", "database_id": "PREENCHER_APOS_wrangler_d1_create", "migrations_dir": "migrations" }
+      ],
+      "r2_buckets": [{ "binding": "PHOTOS", "bucket_name": "gavealab-membros-fotos" }],
+      "vars": {
+        "APP_ENV": "production",
+        "APP_URL": "https://membros.gavealab.com.br",
+        "EMAIL_FROM": "GáveaLab Communities <membros@gavealab.com.br>",
+        "PASSWORD_PBKDF2_ITERATIONS": "600000",
+        "TURNSTILE_SITE_KEY": "PREENCHER_CHAVE_PUBLICA_TURNSTILE"
+      },
+      "observability": { "enabled": true }
+    }
+  }
 }

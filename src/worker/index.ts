@@ -52,7 +52,9 @@ app.route("/admin", adminRoutes);
 
 // Caixa de saída de e-mails — existe só fora de produção, para testar convites e recuperação de senha.
 app.get("/dev/outbox", async (c) => {
-  if (isProduction(c.env) || c.env.RESEND_API_KEY) fail(404, "Não encontrado.");
+  // Proteção dupla: além de não ser produção, só responde quando acessado pela própria máquina.
+  const host = new URL(c.req.url).hostname;
+  if (isProduction(c.env) || c.env.RESEND_API_KEY || !["localhost", "127.0.0.1"].includes(host)) fail(404, "Não encontrado.");
   const { results } = await c.env.DB.prepare("SELECT id, to_email, subject, text, html, created_at FROM dev_outbox ORDER BY id DESC LIMIT 50").all();
   return c.json({ emails: results });
 });
